@@ -67,6 +67,16 @@ make sure to start ngrok: `ngrok start --all`
 
 ## script 
 
+J: hi doc! how you doing! 
+DP: good. good. how about you? its a big week!
+J: absolutely! ive been waiting for this new mission impossible movie to come out for a _year_! 
+DP: oh yah? what's it about? 
+J: well, there's this omnisicent rougue Ai that's threatening to upend the world order! economies will be destroyed, countles lives ruined, etc. anarchy! dogs and cats! living together! i mean.. :heh: can you imagine something like _that_? ehhhhh. so... what're we going to talk about today, doc?  
+DP: :sheepishly: well... AI..
+J: oh. 
+DP: yah. the spring ai 1.0 release came out yesterday. 
+
+
 Dr Pollack talks about the Spring AI 1.0 release. mentions that there are problems in AI but the can be overcome with the right use of patterns. shows the pain-to-patterns slide. mntion that josh and christian talked about it last year.
 
 Its been a year since christian + josh took this stage introducing the world to Prancer and Peanut 
@@ -80,24 +90,38 @@ prancer’s settling in to his new home with peanut. here are some photos of the
 DEMO: poloroid photos of these two evil doggos attacking NYC like godzilla and the stay puft marshmallow man from ghostbusters; images of the dogs terrorizing cats with a giant claw machine like the ones used to get stuffed toys from vending machines; images of the dogs sleeping like idiots, etc.; pictures of them sleeping on claws's legs like the cats from Inspector Gadget.
 
 time has passed and weve built automatic controls to keep watch over these terrible dogs, including the bark detection monitor: which captures information about when and at what intensity these evil dogs bark. we use that as a proxy for whether they're happy or not. It relied on a rest endpoint and exported some metrics via the actuator which we could occasionally monitor. 
-DEMO: its summer 2024; let's write the core `/barks` endpoit and export the two metrics
+DEMO: its summer 2024; let's write the core `/barks` endpoit and export the two metrics; well also need to code up a spring cloud config server, too.
 
 but then in November 2024, something magic happened. anthropic, the company behind the claude LLM, released this new protocol called MCP. MCP is how you export tools for other services to use.
 
 there are _thousands_ of MCP services. Hell, there are many directories of MCP services! we raced to implement good support for it. 
 DEMO: here are before and after photos of spring ai team co-lead christian tsolov! the struggle! 
 
-MCP lets the chat box be the UX. 
+MCP lets the chat box be the UX. help people unlock potential 
 
-we add an MCP service to monitor the Bark Detection Monitor. “Hey, Doggy,” how're the dogs? All quiet? That's bizarre. They're usually more agitated at this time. / oy yah? What time is that? / all the time. 
-We need to give Dogmon AI access to the configuration and access to the underlying storage to help us diagnose and fix this issue 
-Lets manually code an Actuator health indicator LOCAL @tool  (tool demo)
-Lets manually code up a Config Server MCP tool server and then connect it to Dogmon (MCP server and client demo)
+let's add an MCP service to monitor the Bark Detection Monitor. now we can query its state. lets go to Claude and add an integration for this newly minted service. we'll use ngrok to export it publicly for ease of testing.
+
+“Hey, Doggy,” how're the dogs? All quiet? That's bizarre. They're usually more agitated at this time. / oy yah? What time is that? / all the time. 
+
+what are they up to, anyhow? 
+
+DEMO: funny pictures of the evil dogs in our 'Prancer Cam'
+
+i wonder where the issue could be. no idea. 
+
+DEMO: lets install some other convenient MCP services. there's one for Github and there's one for Spring Cloud COnfig Server, whci of course is powering our `bark-detector`.  this is in a branch for spring-cloud-config-server, but hopefully it gets merged. it's really useful. restart claude desktop.
+
 Well need to give the AI executive agency / capability whatever to effect changes, lets integrate the Github MCP service (reuse demo)
-All together now: diagnose! Fix! 
-Its november 2024: mcp is a new and novel thing
-Dr. pollack explains MCP
-Lets add an MCP client that looks at the metrics/health indicators coming from our dog bark detection service
+
+All together now: `what's the value of barks.alert-threshold for the default profile for the application called bark-detector in spring cloud config server?`
+
+And that's _that_! Nice! 
+
+I wonder what happened? computer. bring up any picture of Prancer from the last two weeks. 
+
+DEMO: Prancer in his mission impossible outfit changing the files. 
+
+Oh!! _that's_ what happened! he's a mission impossible fan, too! 
 
 
 
