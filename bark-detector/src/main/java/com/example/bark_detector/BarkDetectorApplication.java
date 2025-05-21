@@ -6,10 +6,7 @@ import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.annotation.Tool;
@@ -52,24 +49,21 @@ class BarkDetectorController {
 
     private final ChatClient ai;
     private final Environment environment;
-
-    //    private final float threshold;
     private final MetricsEndpoint metricsEndpoint;
     private final Counter barksReceived, alertsTriggered;
 
     BarkDetectorController(
-            ToolCallbackProvider syncMcpToolCallbackProvider,
+            ToolCallbackProvider githubMcpProvider,
             McpSyncClient configServerMcpClient,
             ChatClient.Builder ai,
             Environment environment,
             MetricsEndpoint metricsEndpoint,
             MeterRegistry meterRegistry) {
 
-
         this.ai = ai
                 .defaultToolCallbacks(new SyncMcpToolCallbackProvider(configServerMcpClient))
-                .defaultToolCallbacks(syncMcpToolCallbackProvider.getToolCallbacks())
-//                .defaultAdvisors(pmca)
+                .defaultToolCallbacks(githubMcpProvider.getToolCallbacks())
+                .defaultTools(this)
                 .build();
 
         this.environment = environment;
@@ -104,13 +98,10 @@ class BarkDetectorController {
         }
     }
 
-    @PostMapping("/{user}/dogops")
-    String dogops(@PathVariable String user, @RequestParam String question) {
+    @PostMapping("/dogops")
+    String dogops(@RequestParam String question) {
         return this.ai
                 .prompt(question)
-                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, user))
-                .tools(this) //
-//                .toolCallbacks()
                 .call()
                 .content();
     }
