@@ -71,7 +71,7 @@ J: hi doc! how you doing!
 DP: good. good. how about you? its a big week!
 J: absolutely! ive been waiting for this new mission impossible movie to come out for a _year_! 
 DP: oh yah? what's it about? 
-J: well, there's this omnisicent rougue Ai that's threatening to upend the world order! economies will be destroyed, countles lives ruined, etc. anarchy! dogs and cats! living together! i mean.. :heh: can you imagine something like _that_? ehhhhh. so... what're we going to talk about today, doc?  
+J: well, there's this omnisicent rougue Ai that's threatening to upend the world order! economies will be destroyed, countles lives ruined, etc. anarchy! dogs and cats! living together! I mean.. :heh: can you imagine something like _that_? ehhhhh. so... what're we going to talk about today, doc?  
 DP: :sheepishly: well... AI..
 J: oh. 
 DP: yah. the spring ai 1.0 release came out yesterday. 

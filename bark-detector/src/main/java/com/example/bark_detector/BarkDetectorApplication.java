@@ -2,15 +2,25 @@ package com.example.bark_detector;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.modelcontextprotocol.client.McpClient;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,12 +37,12 @@ public class BarkDetectorApplication {
     }
 
     @Bean
-    MethodToolCallbackProvider methodToolCallbackProvider(BarkDetectorController controller) {
-        return MethodToolCallbackProvider
-                .builder()
-                .toolObjects(controller)
+    McpSyncClient mcpSyncClient() {
+        var mcp = McpClient
+                .sync(HttpClientSseClientTransport.builder("http://localhost:8888").build())
                 .build();
-
+        mcp.initialize();
+        return mcp;
     }
 }
 
@@ -40,7 +50,7 @@ public class BarkDetectorApplication {
 @Controller
 class BarkDetectorController {
 
-
+    private final ChatClient ai;
     private final Environment environment;
 
     //    private final float threshold;
@@ -48,9 +58,19 @@ class BarkDetectorController {
     private final Counter barksReceived, alertsTriggered;
 
     BarkDetectorController(
+            ToolCallbackProvider syncMcpToolCallbackProvider,
+            McpSyncClient configServerMcpClient,
+            ChatClient.Builder ai,
             Environment environment,
-//            @Value("${barks.alert-threshold}") float threshold,
-            MetricsEndpoint metricsEndpoint, MeterRegistry meterRegistry) {
+            MetricsEndpoint metricsEndpoint,
+            MeterRegistry meterRegistry) {
+
+
+        this.ai = ai
+                .defaultToolCallbacks(new SyncMcpToolCallbackProvider(configServerMcpClient))
+                .defaultToolCallbacks(syncMcpToolCallbackProvider.getToolCallbacks())
+//                .defaultAdvisors(pmca)
+                .build();
 
         this.environment = environment;
         this.metricsEndpoint = metricsEndpoint;
@@ -83,4 +103,16 @@ class BarkDetectorController {
             this.alertsTriggered.increment();
         }
     }
+
+    @PostMapping("/{user}/dogops")
+    String dogops(@PathVariable String user, @RequestParam String question) {
+        return this.ai
+                .prompt(question)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, user))
+                .tools(this) //
+//                .toolCallbacks()
+                .call()
+                .content();
+    }
+
 }
