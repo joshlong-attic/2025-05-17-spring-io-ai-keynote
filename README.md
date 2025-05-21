@@ -183,6 +183,6 @@ http --form POST  :8080/dogops question=="set the value of barks.alert-threshold
 
 
 ## maybe?
-http --form POST  :8080/dogops question=="set the value of barks.alert-threshold to 0.6666 in bark-detector.properties in the github  repository called joshlong-attic/2025-05-17-spring-io-ai-keynote-config/"
+http --form POST :8080/dogops question=="set the value of barks.alert-threshold to 0.6666 in bark-detector.properties in the github  repository called joshlong-attic/2025-05-17-spring-io-ai-keynote-config/"
 
 
