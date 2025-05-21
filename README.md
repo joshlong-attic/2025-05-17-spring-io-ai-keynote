@@ -143,3 +143,46 @@ The config file for Claude Desktop is ~/Library/Application Support/Claude/claud
 Ask claude desktop: `what's the value of barks.alert-threshold for the default profile for the application called bark-detector in spring cloud config server?`
 
 
+## working script the night before 
+
+# Dog Ops: Prancer Strikes Back, Now It's Personal
+
+* dr. pollack slides
+* meet the dogs
+* here's last years code
+* theyre now happily homed but we need sophisticated dog monitoring so we dont bother our neighbors
+* start.spring.io - `bark-detector` (without AI tools)
+    * it in turn uses the spring cloud config server
+* seems like its working but maybe its working too well? there's no barking! and i can hear the barking. somethings wrong.
+* in this case we can hear the problem but what about in the future? lets build an AI endpoint and give it access to the metrics
+* we got some feedback and realize its not working; were not got alerting, so soemthing's wrong
+* add /dogops endpoint, pointing to two new tools that use the metrics that are already there
+* we can chat to ask about metrics. indeed, something's wrong. (prompt #1)
+* we need access to some remote services.
+* enter MCP ; it came out in november. u remember november, don't ya? me either.
+* this was a hard time for the spring ai team
+* here's a before and after photo of christian
+* ok, its got something to do with the config. lets give the AI model access to our config server. thanks to Ryan Baxters ingenious hackery. there are so many amazing mcp services out there. theres even a batch one from mahmoud ben hassine. new spring batch admin? chatmin?
+*
+
+
+## prompts
+
+### multi-shot
+
+
+
+http --form POST  :8080/dogops question=="give me the value for all the metrics with the word 'bark' "
+
+http --form POST  :8080/dogops question=="what are the environment values for the bark alert threshold for the main label for the  bark-detector application? "
+
+
+http --form POST  :8080/dogops question=="set the value of barks.alert-threshold to 0.1 in bark-detector.properties in the github repository called joshlong-attic/2025-05-17-spring-io-ai-keynote-config"
+
+
+
+
+## maybe?
+http --form POST  :8080/dogops question=="set the value of barks.alert-threshold to 0.6666 in bark-detector.properties in the github  repository called joshlong-attic/2025-05-17-spring-io-ai-keynote-config/"
+
+
