@@ -76,6 +76,19 @@ class BarkDetectorController {
         this.alertsTriggered.increment(1);
     }
 
+
+
+    @PostMapping("/barks")
+    void receiveBark(@RequestParam float intensity) {
+        var threshold = environment.getProperty("barks.alert-threshold", Float.class, 0F);
+        System.out.println("the value for the the threshold is: " + threshold + ".");
+        this.barksReceived.increment();
+        if (intensity > threshold) {
+            this.alertsTriggered.increment();
+        }
+    }
+
+
     @Tool(description = "returns all the metric names for the bark-detector application")
     Collection<String> metrics() {
         return this.metricsEndpoint.listNames().getNames();
@@ -88,15 +101,6 @@ class BarkDetectorController {
                 .getMeasurements();
     }
 
-    @PostMapping("/barks")
-    void receiveBark(@RequestParam float intensity) {
-        var threshold = environment.getProperty("barks.alert-threshold", Float.class, 0F);
-        System.out.println("the value for the the threshold is: " + threshold + ".");
-        this.barksReceived.increment();
-        if (intensity > threshold) {
-            this.alertsTriggered.increment();
-        }
-    }
 
     @PostMapping("/dogops")
     String dogops(@RequestParam String question) {

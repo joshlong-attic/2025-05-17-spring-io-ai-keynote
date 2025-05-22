@@ -174,7 +174,10 @@ Ask claude desktop: `what's the value of barks.alert-threshold for the default p
 
 http --form POST  :8080/dogops question=="give me the value for all the metrics with the word 'bark' "
 
-http --form POST  :8080/dogops question=="what are the environment values for the bark alert threshold for the main label for the  bark-detector application? "
+<!-- http --form POST  :8080/dogops question=="what are the environment values for the bark alert threshold for the main label for the  bark-detector application? " -->
+
+http   :8080/dogops question=="what are the environment values for the main label for the bark-detector application? "
+
 
 
 http --form POST  :8080/dogops question=="set the value of barks.alert-threshold to 0.1 in bark-detector.properties in the github repository called joshlong-attic/2025-05-17-spring-io-ai-keynote-config"
