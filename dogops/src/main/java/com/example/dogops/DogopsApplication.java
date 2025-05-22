@@ -1,4 +1,4 @@
-package com.example.bark_detector;
+package com.example.dogops;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -6,59 +6,52 @@ import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Collection;
 import java.util.List;
 
-
 @SpringBootApplication
-public class BarkDetectorApplication {
+public class DogopsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(BarkDetectorApplication.class, args);
+        SpringApplication.run(DogopsApplication.class, args);
     }
 
     @Bean
     McpSyncClient mcpSyncClient() {
         var mcp = McpClient
-                .sync(HttpClientSseClientTransport.builder("http://localhost:8888").build())
-                .build();
+                .sync(HttpClientSseClientTransport.builder("http://localhost:8888").build()).build();
         mcp.initialize();
         return mcp;
     }
 }
 
-@ResponseBody
+
 @Controller
-class BarkDetectorController {
+@ResponseBody
+class DogopsController {
 
+    private final Counter received, alerted;
+    private final MetricsEndpoint endpoint;
     private final ChatClient ai;
-    private final Environment environment;
-    private final MetricsEndpoint metricsEndpoint;
-    private final Counter barksReceived, alertsTriggered;
 
-    BarkDetectorController(
-            ToolCallbackProvider githubMcpProvider,
+    DogopsController(
             McpSyncClient configServerMcpClient,
+            ToolCallbackProvider githubMcpProvider,
+            MeterRegistry registry,
             ChatClient.Builder ai,
-            Environment environment,
-            MetricsEndpoint metricsEndpoint,
-            MeterRegistry meterRegistry) {
+            MetricsEndpoint endpoint1) {
 
         this.ai = ai
                 .defaultToolCallbacks(new SyncMcpToolCallbackProvider(configServerMcpClient))
@@ -66,48 +59,36 @@ class BarkDetectorController {
                 .defaultTools(this)
                 .build();
 
-        this.environment = environment;
-        this.metricsEndpoint = metricsEndpoint;
+        // just imagine that we had some sort of collection mechanism to receive these values.
 
-        this.barksReceived = meterRegistry.counter("barks.received");
-        this.barksReceived.increment(2000);
+        this.endpoint = endpoint1;
 
-        this.alertsTriggered = meterRegistry.counter("barks.alerted");
-        this.alertsTriggered.increment(1);
-    }
+        this.alerted = registry.counter("barks.alerted");
+        this.alerted.increment(1);
 
-
-
-    @PostMapping("/barks")
-    void receiveBark(@RequestParam float intensity) {
-        var threshold = environment.getProperty("barks.alert-threshold", Float.class, 0F);
-        System.out.println("the value for the the threshold is: " + threshold + ".");
-        this.barksReceived.increment();
-        if (intensity > threshold) {
-            this.alertsTriggered.increment();
-        }
+        this.received = registry.counter("barks.received");
+        this.received.increment(2000);
     }
 
 
     @Tool(description = "returns all the metric names for the bark-detector application")
-    Collection<String> metrics() {
-        return this.metricsEndpoint.listNames().getNames();
+    Collection<String> metricNames() {
+        return this.endpoint.listNames().getNames();
     }
 
     @Tool(description = "returns the value of a metric for the bark-detector application")
-    List<MetricsEndpoint.Sample> metricValue(@ToolParam String metricName) {
-        return this.metricsEndpoint
+    List<MetricsEndpoint.Sample> metricValue(String metricName) {
+        return this.endpoint
                 .metric(metricName, List.of())
                 .getMeasurements();
     }
 
 
-    @PostMapping("/dogops")
-    String dogops(@RequestParam String question) {
+    @GetMapping("/dogops")
+    String inquire(@RequestParam String question) {
         return this.ai
                 .prompt(question)
                 .call()
                 .content();
     }
-
 }
